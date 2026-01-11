@@ -8,7 +8,7 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800&display=swap" rel="stylesheet">
 
   <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -24,50 +24,48 @@
     input[type="number"]::-webkit-outer-spin-button,
     input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     input[type="number"] { -moz-appearance: textfield; }
-    /* nicer tap targets */
     button, input { -webkit-tap-highlight-color: transparent; }
   </style>
 </head>
 
 <body class="bg-slate-950 text-slate-100 min-h-screen">
-  <div class="max-w-xl mx-auto px-4 pb-24">
+  <!-- App shell -->
+  <div class="max-w-md mx-auto px-4 pb-28">
     <!-- Header -->
-    <header class="sticky top-0 z-20 pt-4 pb-3 bg-slate-950/85 backdrop-blur border-b border-slate-900">
+    <header class="sticky top-0 z-30 pt-4 pb-3 bg-slate-950/85 backdrop-blur border-b border-slate-900">
       <div class="flex items-center justify-between gap-3">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-slate-800/80 border border-slate-700 flex items-center justify-center shadow">
+          <div class="w-10 h-10 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center shadow">
             <i data-lucide="split" class="w-5 h-5"></i>
           </div>
           <div>
-            <div class="text-lg font-bold leading-tight">
-              KamaKama <span class="text-slate-300 font-medium">(SplitIt)</span>
-            </div>
+            <div class="text-lg font-extrabold leading-tight">KamaKama <span class="text-slate-300 font-semibold">(SplitIt)</span></div>
             <div class="text-xs text-slate-400">חלוקה חברתית • מהירה • משחקית</div>
           </div>
         </div>
 
         <button id="btnReset"
-          class="inline-flex items-center gap-2 text-xs px-3 py-2 rounded-xl bg-slate-800/80 border border-slate-700 hover:bg-slate-700 transition focus:outline-none focus:ring-2 focus:ring-slate-500">
+          class="inline-flex items-center gap-2 text-xs px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 transition focus:outline-none focus:ring-2 focus:ring-slate-500">
           <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
           איפוס
         </button>
       </div>
 
-      <!-- Nav -->
-      <nav class="grid grid-cols-4 gap-2 mt-4">
-        <button data-nav="dashboard" class="navBtn px-3 py-2 rounded-xl bg-slate-800/80 border border-slate-700 hover:bg-slate-700 transition text-sm">
-          דשבורד
-        </button>
-        <button data-nav="equal" class="navBtn px-3 py-2 rounded-xl bg-slate-800/80 border border-slate-700 hover:bg-slate-700 transition text-sm">
-          שווה
-        </button>
-        <button data-nav="itemized" class="navBtn px-3 py-2 rounded-xl bg-slate-800/80 border border-slate-700 hover:bg-slate-700 transition text-sm">
-          פריטים
-        </button>
-        <button data-nav="roulette" class="navBtn px-3 py-2 rounded-xl bg-slate-800/80 border border-slate-700 hover:bg-slate-700 transition text-sm">
-          רולטה
-        </button>
-      </nav>
+      <!-- Mini summary pill -->
+      <button id="goDashboardPill"
+        class="mt-3 w-full rounded-2xl bg-slate-900/60 border border-slate-800 px-4 py-3 text-sm flex items-center justify-between hover:bg-slate-900 transition">
+        <div class="flex items-center gap-2 text-slate-300">
+          <i data-lucide="receipt" class="w-4 h-4"></i>
+          <span>סה״כ:</span>
+          <span id="pillTotal" class="font-extrabold text-slate-100">0 ₪</span>
+        </div>
+        <div class="flex items-center gap-2 text-slate-400">
+          <i data-lucide="users" class="w-4 h-4"></i>
+          <span>סועדים:</span>
+          <span id="pillDiners" class="font-bold text-slate-200">0</span>
+          <i data-lucide="chevron-left" class="w-4 h-4"></i>
+        </div>
+      </button>
     </header>
 
     <!-- Toast -->
@@ -79,13 +77,13 @@
       <section data-screen="dashboard" class="screen space-y-4">
         <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 shadow">
           <div class="flex items-center justify-between">
-            <h2 class="font-bold text-base">סכום החשבון</h2>
-            <span class="text-xs text-slate-400">ללא התקנה • עובד בדפדפן</span>
+            <h2 class="font-extrabold text-base">סכום החשבון</h2>
+            <span class="text-xs text-slate-400">Client-side • ללא התקנה</span>
           </div>
 
           <div class="mt-3 grid grid-cols-6 gap-2 items-center">
             <button id="billMinus"
-              class="col-span-1 rounded-xl bg-slate-800/80 border border-slate-700 hover:bg-slate-700 transition py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500">
+              class="col-span-1 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 transition py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500">
               -10
             </button>
 
@@ -94,31 +92,31 @@
               placeholder="0" />
 
             <button id="billPlus"
-              class="col-span-1 rounded-xl bg-slate-800/80 border border-slate-700 hover:bg-slate-700 transition py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500">
+              class="col-span-1 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 transition py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-500">
               +10
             </button>
           </div>
 
           <div class="mt-4 flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <i data-lucide="receipt" class="w-4 h-4 text-slate-300"></i>
+              <i data-lucide="badge-percent" class="w-4 h-4 text-slate-300"></i>
               <span class="text-sm text-slate-300">טיפ</span>
-              <span id="tipPctLabel" class="text-sm font-bold">12%</span>
+              <span id="tipPctLabel" class="text-sm font-extrabold">12%</span>
             </div>
             <div class="text-sm text-slate-300">
               סה״כ לתשלום: <span id="totalWithTipLabel" class="font-extrabold">0 ₪</span>
             </div>
           </div>
 
-          <input id="tipPct" type="range" min="0" max="25" step="1" class="w-full mt-2 accent-slate-400" />
+          <input id="tipPct" type="range" min="0" max="25" step="1" class="w-full mt-2 accent-slate-300" />
           <div class="text-xs text-slate-500 mt-1">הטיפ מתווסף לחשבון ומתחלק לפי מצב החלוקה.</div>
         </div>
 
         <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 shadow">
           <div class="flex items-center justify-between">
-            <h2 class="font-bold text-base">סועדים</h2>
+            <h2 class="font-extrabold text-base">סועדים</h2>
             <button id="addDiner"
-              class="inline-flex items-center gap-2 text-xs px-3 py-2 rounded-xl bg-slate-800/80 border border-slate-700 hover:bg-slate-700 transition focus:outline-none focus:ring-2 focus:ring-slate-500">
+              class="inline-flex items-center gap-2 text-xs px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 transition focus:outline-none focus:ring-2 focus:ring-slate-500">
               <i data-lucide="user-plus" class="w-4 h-4"></i>
               הוסף
             </button>
@@ -127,35 +125,29 @@
           <div id="dinersListDashboard" class="mt-3 space-y-2"></div>
 
           <div class="mt-3 flex items-center justify-between text-sm">
-            <div class="text-slate-300">כמות סועדים: <span id="dinersCount" class="font-bold">0</span></div>
-            <div class="text-slate-400 text-xs">ערוך/י שמות, הוסף/י או הסר/י בקליק.</div>
+            <div class="text-slate-300">כמות סועדים: <span id="dinersCount" class="font-extrabold">0</span></div>
+            <button id="resetSubs" class="text-xs px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 hover:bg-slate-900 transition">
+              איפוס סכומי פריטים
+            </button>
           </div>
         </div>
 
         <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 shadow">
-          <h2 class="font-bold text-base mb-2">מה עושים עכשיו?</h2>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <h2 class="font-extrabold text-base mb-2">מה עושים עכשיו?</h2>
+          <div class="grid grid-cols-1 gap-2">
             <button data-go="equal"
-              class="goBtn rounded-2xl bg-slate-800/80 border border-slate-700 hover:bg-slate-700 transition p-3 text-right focus:outline-none focus:ring-2 focus:ring-slate-500">
-              <div class="flex items-center gap-2 font-bold">
-                <i data-lucide="divide" class="w-4 h-4"></i> חלוקה שווה
-              </div>
+              class="goBtn rounded-2xl bg-slate-900 border border-slate-800 hover:bg-slate-800 transition p-3 text-right focus:outline-none focus:ring-2 focus:ring-slate-500">
+              <div class="flex items-center gap-2 font-extrabold"><i data-lucide="divide" class="w-4 h-4"></i> חלוקה שווה</div>
               <div class="text-xs text-slate-300 mt-1">סכום אחיד לכל אחד/ת</div>
             </button>
-
             <button data-go="itemized"
-              class="goBtn rounded-2xl bg-slate-800/80 border border-slate-700 hover:bg-slate-700 transition p-3 text-right focus:outline-none focus:ring-2 focus:ring-slate-500">
-              <div class="flex items-center gap-2 font-bold">
-                <i data-lucide="list" class="w-4 h-4"></i> לפי פריטים
-              </div>
-              <div class="text-xs text-slate-300 mt-1">כל אחד מזין כמה אכל</div>
+              class="goBtn rounded-2xl bg-slate-900 border border-slate-800 hover:bg-slate-800 transition p-3 text-right focus:outline-none focus:ring-2 focus:ring-slate-500">
+              <div class="flex items-center gap-2 font-extrabold"><i data-lucide="list" class="w-4 h-4"></i> לפי פריטים</div>
+              <div class="text-xs text-slate-300 mt-1">כל אחד מזין כמה אכל (ללא טיפ)</div>
             </button>
-
             <button data-go="roulette"
-              class="goBtn rounded-2xl bg-slate-800/80 border border-slate-700 hover:bg-slate-700 transition p-3 text-right focus:outline-none focus:ring-2 focus:ring-slate-500">
-              <div class="flex items-center gap-2 font-bold">
-                <i data-lucide="sparkles" class="w-4 h-4"></i> רולטת אשראי
-              </div>
+              class="goBtn rounded-2xl bg-slate-900 border border-slate-800 hover:bg-slate-800 transition p-3 text-right focus:outline-none focus:ring-2 focus:ring-slate-500">
+              <div class="flex items-center gap-2 font-extrabold"><i data-lucide="sparkles" class="w-4 h-4"></i> רולטת אשראי</div>
               <div class="text-xs text-slate-300 mt-1">מגרילים מי משלם 😈</div>
             </button>
           </div>
@@ -166,34 +158,32 @@
       <section data-screen="equal" class="screen hidden space-y-4">
         <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 shadow">
           <div class="flex items-center justify-between">
-            <h2 class="font-bold text-base">חלוקה שווה</h2>
+            <h2 class="font-extrabold text-base">חלוקה שווה</h2>
             <span class="text-xs text-slate-400">כולל טיפ</span>
           </div>
 
           <div class="mt-3 rounded-2xl bg-slate-950 border border-slate-800 p-4">
             <div class="text-sm text-slate-400">לכל אחד/ת:</div>
-            <div id="equalPerPerson" class="text-3xl font-extrabold mt-1">0 ₪</div>
+            <div id="equalPerPerson" class="text-3xl font-black mt-1">0 ₪</div>
             <div id="equalMeta" class="text-xs text-slate-500 mt-2"></div>
           </div>
 
           <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
             <button id="copyEqualMsg"
-              class="rounded-2xl bg-slate-800/80 border border-slate-700 hover:bg-slate-700 transition p-3 text-sm inline-flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-slate-500">
+              class="rounded-2xl bg-slate-900 border border-slate-800 hover:bg-slate-800 transition p-3 text-sm inline-flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-slate-500">
               <i data-lucide="copy" class="w-4 h-4"></i>
               העתק הודעה
             </button>
             <button id="shareEqualMsg"
-              class="rounded-2xl bg-slate-200 text-slate-950 hover:bg-white transition p-3 text-sm inline-flex items-center justify-center gap-2 font-bold focus:outline-none focus:ring-2 focus:ring-slate-300">
+              class="rounded-2xl bg-slate-200 text-slate-950 hover:bg-white transition p-3 text-sm inline-flex items-center justify-center gap-2 font-extrabold focus:outline-none focus:ring-2 focus:ring-slate-300">
               <i data-lucide="share-2" class="w-4 h-4"></i>
               שתף
             </button>
           </div>
-
-          <div class="mt-3 text-xs text-slate-500">הודעת העתק-הדבק מוכנה לוואטסאפ/ביט/פייבוקס.</div>
         </div>
 
         <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 shadow">
-          <h3 class="font-bold text-sm mb-2">פירוט</h3>
+          <h3 class="font-extrabold text-sm mb-2">פירוט</h3>
           <div id="equalBreakdown" class="space-y-2"></div>
         </div>
       </section>
@@ -202,30 +192,30 @@
       <section data-screen="itemized" class="screen hidden space-y-4">
         <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 shadow">
           <div class="flex items-center justify-between">
-            <h2 class="font-bold text-base">חלוקה לפי פריטים</h2>
-            <span class="text-xs text-slate-400">טיפ מחולק פרופורציונלית</span>
+            <h2 class="font-extrabold text-base">חלוקה לפי פריטים</h2>
+            <span class="text-xs text-slate-400">בלי להיתקע בהקלדה</span>
           </div>
 
           <div class="mt-3">
             <div class="text-sm text-slate-300 flex items-center justify-between">
               <span>כיסוי החשבון (ללא טיפ):</span>
-              <span id="itemProgressLabel" class="font-bold">0%</span>
+              <span id="itemProgressLabel" class="font-extrabold">0%</span>
             </div>
             <div class="w-full bg-slate-800 rounded-full h-3 mt-2 overflow-hidden border border-slate-700">
-              <div id="itemProgressBar" class="h-full bg-slate-200 w-0 transition-[width] duration-300"></div>
+              <div id="itemProgressBar" class="h-full bg-slate-200 w-0 transition-[width] duration-200"></div>
             </div>
             <div id="itemRemaining" class="text-xs text-slate-400 mt-2"></div>
           </div>
         </div>
 
         <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 shadow">
-          <h3 class="font-bold text-sm mb-2">הזינו סכום מנות לכל סועד/ת (ללא טיפ)</h3>
+          <h3 class="font-extrabold text-sm mb-2">הזינו לכל סועד/ת סכום מנות (ללא טיפ)</h3>
           <div id="dinersListItemized" class="space-y-2"></div>
 
           <div class="mt-4 rounded-2xl bg-slate-950 border border-slate-800 p-4">
             <div class="text-sm text-slate-400">סה״כ לתשלום (כולל טיפ):</div>
-            <div id="itemTotalWithTip" class="text-2xl font-extrabold mt-1">0 ₪</div>
-            <div class="text-xs text-slate-500 mt-2">הטיפ מתחלק לפי החלק של כל אחד/ת בחשבון.</div>
+            <div id="itemTotalWithTip" class="text-2xl font-black mt-1">0 ₪</div>
+            <div class="text-xs text-slate-500 mt-2">הטיפ מתחלק פרופורציונלית לפי הסכומים שהוזנו.</div>
           </div>
         </div>
       </section>
@@ -234,37 +224,42 @@
       <section data-screen="roulette" class="screen hidden space-y-4">
         <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 shadow">
           <div class="flex items-center justify-between">
-            <h2 class="font-bold text-base">רולטת אשראי</h2>
-            <span class="text-xs text-slate-400">Gamification</span>
+            <h2 class="font-extrabold text-base">רולטת אשראי</h2>
+            <span class="text-xs text-slate-400">סיבוב חלק</span>
           </div>
 
           <div class="mt-3 flex flex-col items-center gap-3">
             <div class="relative">
-              <div class="w-72 h-72 sm:w-80 sm:h-80 rounded-full bg-slate-950 border border-slate-800 shadow overflow-hidden flex items-center justify-center">
+              <!-- rotate WRAPPER (fixes "wheel not spinning" bug) -->
+              <div id="wheelRotate"
+                class="w-72 h-72 sm:w-80 sm:h-80 rounded-full bg-slate-950 border border-slate-800 shadow overflow-hidden flex items-center justify-center"
+                style="transform: rotate(0deg); transition: transform 1400ms cubic-bezier(0.15, 0.9, 0.2, 1);">
                 <svg id="wheelSvg" viewBox="-110 -110 220 220" class="w-full h-full"></svg>
               </div>
+
+              <!-- pointer -->
               <div class="absolute -top-2 left-1/2 -translate-x-1/2">
                 <div class="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[18px] border-b-slate-200 drop-shadow"></div>
               </div>
             </div>
 
             <button id="spinBtn"
-              class="w-full rounded-2xl bg-slate-200 text-slate-950 hover:bg-white transition py-3 font-extrabold inline-flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-slate-300">
+              class="w-full rounded-2xl bg-slate-200 text-slate-950 hover:bg-white transition py-3 font-black inline-flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-slate-300">
               <i data-lucide="play" class="w-5 h-5"></i>
               סובב!
             </button>
 
             <div id="winnerBox" class="hidden w-full rounded-2xl bg-slate-950 border border-slate-800 p-4">
               <div class="text-sm text-slate-400">המנצח/ת:</div>
-              <div id="winnerName" class="text-2xl font-extrabold mt-1"></div>
+              <div id="winnerName" class="text-2xl font-black mt-1"></div>
               <div class="mt-3 grid grid-cols-2 gap-2">
                 <button id="shareWinner"
-                  class="rounded-2xl bg-slate-200 text-slate-950 hover:bg-white transition p-3 text-sm inline-flex items-center justify-center gap-2 font-bold focus:outline-none focus:ring-2 focus:ring-slate-300">
+                  class="rounded-2xl bg-slate-200 text-slate-950 hover:bg-white transition p-3 text-sm inline-flex items-center justify-center gap-2 font-black focus:outline-none focus:ring-2 focus:ring-slate-300">
                   <i data-lucide="share-2" class="w-4 h-4"></i>
                   שתף
                 </button>
                 <button id="copyWinner"
-                  class="rounded-2xl bg-slate-800/80 border border-slate-700 hover:bg-slate-700 transition p-3 text-sm inline-flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-slate-500">
+                  class="rounded-2xl bg-slate-900 border border-slate-800 hover:bg-slate-800 transition p-3 text-sm inline-flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-slate-500">
                   <i data-lucide="copy" class="w-4 h-4"></i>
                   העתק
                 </button>
@@ -275,43 +270,64 @@
 
         <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 shadow">
           <div class="flex items-center justify-between">
-            <h3 class="font-bold text-sm">עריכה מהירה של שמות</h3>
+            <h3 class="font-extrabold text-sm">עריכת שמות (מהיר)</h3>
             <span class="text-xs text-slate-500">בלי לחזור לדשבורד</span>
           </div>
           <div id="dinersListRoulette" class="mt-3 space-y-2"></div>
         </div>
       </section>
     </main>
-
-    <footer class="mt-6 text-center text-xs text-slate-500">
-      <div>Made for quick, fun bill-splitting. Client-side only.</div>
-    </footer>
   </div>
+
+  <!-- Bottom Tab Bar -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/85 backdrop-blur border-t border-slate-900">
+    <div class="max-w-md mx-auto px-4 py-2 grid grid-cols-4 gap-2">
+      <button data-nav="dashboard" class="tabBtn rounded-2xl px-2 py-2 text-xs flex flex-col items-center gap-1 bg-slate-900 border border-slate-800 hover:bg-slate-800 transition">
+        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+        דשבורד
+      </button>
+      <button data-nav="equal" class="tabBtn rounded-2xl px-2 py-2 text-xs flex flex-col items-center gap-1 bg-slate-900 border border-slate-800 hover:bg-slate-800 transition">
+        <i data-lucide="divide" class="w-5 h-5"></i>
+        שווה
+      </button>
+      <button data-nav="itemized" class="tabBtn rounded-2xl px-2 py-2 text-xs flex flex-col items-center gap-1 bg-slate-900 border border-slate-800 hover:bg-slate-800 transition">
+        <i data-lucide="list" class="w-5 h-5"></i>
+        פריטים
+      </button>
+      <button data-nav="roulette" class="tabBtn rounded-2xl px-2 py-2 text-xs flex flex-col items-center gap-1 bg-slate-900 border border-slate-800 hover:bg-slate-800 transition">
+        <i data-lucide="sparkles" class="w-5 h-5"></i>
+        רולטה
+      </button>
+    </div>
+  </nav>
 
 <script>
 (() => {
-  // ---------- Polyfills / Safe helpers ----------
+  // ---------- Safe helpers ----------
   const safeUUID = () => {
     try { return crypto?.randomUUID?.(); } catch (_) {}
     return "id-" + Math.random().toString(16).slice(2) + "-" + Date.now().toString(16);
   };
-
   const safeClone = (obj) => {
     try { return structuredClone(obj); } catch (_) {}
     return JSON.parse(JSON.stringify(obj));
   };
 
-  // ---------- Utilities ----------
+  // ---------- DOM helpers ----------
   const $ = (sel, root=document) => root.querySelector(sel);
   const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
+  const escapeHtml = (s) => String(s ?? "")
+    .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;").replaceAll("'", "&#039;");
 
+  // ---------- Formatting ----------
   const fmtILS = (n) => {
     const x = Number.isFinite(n) ? n : 0;
     return new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' }).format(x);
   };
-
   const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 
+  // ---------- Toast ----------
   const toast = (msg) => {
     const el = $("#toast");
     if (!el) return;
@@ -321,16 +337,13 @@
     toast._t = setTimeout(() => el.classList.add("hidden"), 2200);
   };
 
+  // ---------- Share/Copy ----------
   const safeShare = async ({title, text}) => {
     try {
-      if (navigator.share) {
-        await navigator.share({ title, text });
-        return true;
-      }
+      if (navigator.share) { await navigator.share({ title, text }); return true; }
     } catch (_) {}
     return false;
   };
-
   const copyText = async (text) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -349,15 +362,8 @@
     }
   };
 
-  const escapeHtml = (s) => String(s ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-
   // ---------- State ----------
-  const STORAGE_KEY = "kamakama_state_v2";
+  const STORAGE_KEY = "kamakama_state_v4";
   const defaultState = {
     billAmount: 0,
     tipPct: 12,
@@ -366,13 +372,13 @@
       { id: safeUUID(), name: "נועה", subtotal: 0 },
       { id: safeUUID(), name: "דניאל", subtotal: 0 },
     ],
+    screen: "dashboard",
     lastWinnerId: null,
     wheelRotation: 0,
-    screen: "dashboard"
   };
 
-  const normalizeState = (parsed) => {
-    const s = (parsed && typeof parsed === "object") ? parsed : {};
+  const normalizeState = (raw) => {
+    const s = (raw && typeof raw === "object") ? raw : {};
     const diners = Array.isArray(s.diners) ? s.diners : [];
     const cleanDiners = diners
       .filter(d => d && typeof d === "object")
@@ -381,14 +387,13 @@
         name: String(d.name || "").slice(0, 16),
         subtotal: Math.max(0, Number(d.subtotal) || 0),
       }));
-
     return {
       billAmount: Math.max(0, Number(s.billAmount) || 0),
       tipPct: clamp(Number(s.tipPct) || 12, 0, 25),
       diners: cleanDiners.length ? cleanDiners : safeClone(defaultState.diners),
-      lastWinnerId: (s.lastWinnerId ? String(s.lastWinnerId) : null),
+      screen: ["dashboard","equal","itemized","roulette"].includes(s.screen) ? s.screen : "dashboard",
+      lastWinnerId: s.lastWinnerId ? String(s.lastWinnerId) : null,
       wheelRotation: Number(s.wheelRotation) || 0,
-      screen: ["dashboard","equal","itemized","roulette"].includes(s.screen) ? s.screen : "dashboard"
     };
   };
 
@@ -401,26 +406,43 @@
       return safeClone(defaultState);
     }
   };
-
   let state = loadState();
-  const saveState = () => {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {}
-  };
+  const saveState = () => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {} };
 
+  // ---------- Derived ----------
   const totalWithTip = () => state.billAmount * (1 + state.tipPct / 100);
 
+  // ---------- UI builders ----------
+  const dinerRow = ({id, name}, opts={}) => {
+    const { showRemove=true } = opts;
+    const initial = (name || "?").trim().slice(0,1) || "?";
+    return `
+      <div class="flex items-center gap-2 rounded-2xl bg-slate-950 border border-slate-800 p-2">
+        <div data-initial class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-sm font-extrabold">${escapeHtml(initial)}</div>
+        <input data-diner-name="${escapeHtml(id)}" value="${escapeHtml(name || "")}" maxlength="16"
+               class="flex-1 rounded-xl bg-transparent px-2 py-2 outline-none border border-transparent focus:border-slate-700 text-sm"
+               placeholder="שם" />
+        ${showRemove ? `
+          <button data-diner-remove="${escapeHtml(id)}"
+            class="shrink-0 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 transition px-3 py-2 text-xs">
+            <span class="inline-flex items-center gap-1"><i data-lucide="trash-2" class="w-4 h-4"></i> הסר</span>
+          </button>` : ""}
+      </div>
+    `;
+  };
+
   // ---------- Router ----------
-  const setActiveNav = (name) => {
-    $$(".navBtn").forEach(btn => {
-      const active = btn.dataset.nav === name;
+  const setActiveTabs = (screen) => {
+    const setBtn = (btn, active) => {
       btn.classList.toggle("bg-slate-200", active);
       btn.classList.toggle("text-slate-950", active);
       btn.classList.toggle("border-slate-300", active);
-
-      btn.classList.toggle("bg-slate-800/80", !active);
+      btn.classList.toggle("bg-slate-900", !active);
       btn.classList.toggle("text-slate-100", !active);
-      btn.classList.toggle("border-slate-700", !active);
-    });
+      btn.classList.toggle("border-slate-800", !active);
+    };
+
+    $$(".tabBtn").forEach(btn => setBtn(btn, btn.dataset.nav === screen));
   };
 
   const showScreen = (name) => {
@@ -430,57 +452,34 @@
     saveState();
 
     $$(".screen").forEach(sec => sec.classList.toggle("hidden", sec.dataset.screen !== screen));
-    setActiveNav(screen);
-    // keep hash in sync (nice for refresh)
+    setActiveTabs(screen);
     if (location.hash !== `#${screen}`) location.hash = `#${screen}`;
+
+    // (re)render needed bits
     renderAll();
   };
 
   const currentScreenFromHash = () => {
     const h = (location.hash || "").replace("#","");
     const allowed = new Set(["dashboard","equal","itemized","roulette"]);
-    return allowed.has(h) ? h : state.screen || "dashboard";
-  };
-
-  // ---------- Render Helpers ----------
-  const dinerRow = ({id, name}, opts={}) => {
-    const { showRemove=true, extraRightHtml="" } = opts;
-    const initial = (name || "?").trim().slice(0,1) || "?";
-    return `
-      <div class="flex items-center gap-2 rounded-2xl bg-slate-950 border border-slate-800 p-2">
-        <div class="w-9 h-9 rounded-xl bg-slate-800 flex items-center justify-center text-sm font-bold border border-slate-700">${escapeHtml(initial)}</div>
-        <input data-diner-name="${escapeHtml(id)}" value="${escapeHtml(name || "")}" maxlength="16"
-          class="flex-1 rounded-xl bg-transparent px-2 py-2 outline-none border border-transparent focus:border-slate-700 text-sm"
-          placeholder="שם" />
-        ${extraRightHtml}
-        ${showRemove ? `
-          <button data-diner-remove="${escapeHtml(id)}"
-            class="shrink-0 rounded-xl bg-slate-800/80 border border-slate-700 hover:bg-slate-700 transition px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-slate-500">
-            <span class="inline-flex items-center gap-1"><i data-lucide="trash-2" class="w-4 h-4"></i> הסר</span>
-          </button>` : ""}
-      </div>
-    `;
+    return allowed.has(h) ? h : (state.screen || "dashboard");
   };
 
   // ---------- Rendering ----------
+  function renderPill() {
+    $("#pillTotal").textContent = fmtILS(totalWithTip());
+    $("#pillDiners").textContent = String(state.diners.length);
+  }
+
   function renderDashboard() {
     const billInput = $("#billAmount");
     if (billInput && document.activeElement !== billInput) billInput.value = state.billAmount ? String(state.billAmount) : "";
+    $("#tipPct").value = String(state.tipPct);
+    $("#tipPctLabel").textContent = `${state.tipPct}%`;
+    $("#totalWithTipLabel").textContent = fmtILS(totalWithTip());
+    $("#dinersCount").textContent = String(state.diners.length);
 
-    const tip = $("#tipPct");
-    if (tip) tip.value = String(state.tipPct);
-
-    const tipLbl = $("#tipPctLabel");
-    if (tipLbl) tipLbl.textContent = `${state.tipPct}%`;
-
-    const totalLbl = $("#totalWithTipLabel");
-    if (totalLbl) totalLbl.textContent = fmtILS(totalWithTip());
-
-    const cnt = $("#dinersCount");
-    if (cnt) cnt.textContent = String(state.diners.length);
-
-    const list = $("#dinersListDashboard");
-    if (list) list.innerHTML = state.diners.map(d => dinerRow(d)).join("");
+    $("#dinersListDashboard").innerHTML = state.diners.map(d => dinerRow(d)).join("");
   }
 
   function renderEqual() {
@@ -488,106 +487,102 @@
     const total = totalWithTip();
     const per = n > 0 ? total / n : 0;
 
-    const perEl = $("#equalPerPerson");
-    if (perEl) perEl.textContent = fmtILS(per);
+    $("#equalPerPerson").textContent = fmtILS(per);
+    $("#equalMeta").textContent = (state.billAmount > 0 && n > 0)
+      ? `חשבון: ${fmtILS(state.billAmount)} • טיפ: ${state.tipPct}% • סה״כ: ${fmtILS(total)} • סועדים: ${n}`
+      : "הזן/י חשבון וסועדים בדשבורד";
 
-    const meta = $("#equalMeta");
-    if (meta) {
-      meta.textContent = (state.billAmount > 0 && n > 0)
-        ? `חשבון: ${fmtILS(state.billAmount)} • טיפ: ${state.tipPct}% • סה״כ: ${fmtILS(total)} • סועדים: ${n}`
-        : "הזן/י חשבון וסועדים בדשבורד";
-    }
-
-    const bd = $("#equalBreakdown");
-    if (bd) {
-      bd.innerHTML = state.diners.map(d => `
-        <div class="rounded-2xl bg-slate-950 border border-slate-800 p-3 flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-sm font-bold">
-              ${(d.name||"?").trim().slice(0,1) || "?"}
-            </div>
-            <div class="text-sm font-medium">${escapeHtml(d.name || "ללא שם")}</div>
+    $("#equalBreakdown").innerHTML = state.diners.map(d => `
+      <div class="rounded-2xl bg-slate-950 border border-slate-800 p-3 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-sm font-extrabold">
+            ${(d.name||"?").trim().slice(0,1) || "?"}
           </div>
-          <div class="text-sm font-extrabold">${fmtILS(per)}</div>
+          <div class="text-sm font-semibold">${escapeHtml(d.name || "ללא שם")}</div>
         </div>
-      `).join("");
-    }
+        <div class="text-sm font-black">${fmtILS(per)}</div>
+      </div>
+    `).join("");
   }
 
-  function renderItemized() {
+  // --- ITEMIZED: build once + update derived without re-rendering inputs (fixes "לא עובדת") ---
+  let itemizedBuilt = false;
+
+  function buildItemizedList() {
+    const list = $("#dinersListItemized");
+    if (!list) return;
+    list.innerHTML = state.diners.map(d => `
+      <div class="rounded-2xl bg-slate-950 border border-slate-800 p-3">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-sm font-extrabold">
+              ${(d.name||"?").trim().slice(0,1) || "?"}
+            </div>
+            <div class="text-sm font-semibold">${escapeHtml(d.name || "ללא שם")}</div>
+          </div>
+          <div class="text-xs text-slate-400">
+            סה״כ (כולל טיפ): <span data-item-final="${escapeHtml(d.id)}" class="font-extrabold text-slate-200">0 ₪</span>
+          </div>
+        </div>
+
+        <div class="mt-2 grid grid-cols-6 gap-2 items-center">
+          <span class="col-span-2 text-xs text-slate-400">מנות</span>
+          <input data-diner-sub="${escapeHtml(d.id)}" type="number" inputmode="decimal" min="0" step="0.01"
+                 value="${d.subtotal ? String(d.subtotal) : ""}"
+                 class="col-span-4 w-full rounded-xl bg-slate-900 border border-slate-800 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-600"
+                 placeholder="0" />
+        </div>
+      </div>
+    `).join("");
+    itemizedBuilt = true;
+    updateItemizedDerived();
+  }
+
+  function updateItemizedDerived() {
     const bill = state.billAmount;
     const total = totalWithTip();
-    const totalEl = $("#itemTotalWithTip");
-    if (totalEl) totalEl.textContent = fmtILS(total);
+    $("#itemTotalWithTip").textContent = fmtILS(total);
 
     const sumSub = state.diners.reduce((acc, d) => acc + (Number(d.subtotal) || 0), 0);
     const pct = bill > 0 ? clamp((sumSub / bill) * 100, 0, 200) : 0;
 
-    const pctEl = $("#itemProgressLabel");
-    if (pctEl) pctEl.textContent = `${Math.round(pct)}%`;
-
-    const bar = $("#itemProgressBar");
-    if (bar) bar.style.width = `${clamp(pct, 0, 100)}%`;
+    $("#itemProgressLabel").textContent = `${Math.round(pct)}%`;
+    $("#itemProgressBar").style.width = `${clamp(pct, 0, 100)}%`;
 
     const remaining = bill - sumSub;
     const ok = bill > 0 && Math.abs(remaining) <= 0.01;
-    const remainEl = $("#itemRemaining");
+    const el = $("#itemRemaining");
 
-    if (remainEl) {
-      if (bill <= 0) {
-        remainEl.textContent = "הזן/י סכום חשבון בדשבורד כדי לראות התקדמות.";
-      } else if (ok) {
-        remainEl.innerHTML = `<span class="font-bold text-slate-200">בול! ✅</span> כיסיתם בדיוק את החשבון.`;
-      } else if (remaining > 0) {
-        remainEl.innerHTML = `נשאר פתוח: <span class="font-bold text-slate-200">${fmtILS(remaining)}</span>`;
-      } else {
-        remainEl.innerHTML = `חרגתם ב: <span class="font-bold text-slate-200">${fmtILS(Math.abs(remaining))}</span>`;
-      }
+    if (bill <= 0) {
+      el.textContent = "הזן/י סכום חשבון בדשבורד כדי לראות התקדמות.";
+    } else if (ok) {
+      el.innerHTML = `<span class="font-extrabold text-slate-200">בול! ✅</span> כיסיתם בדיוק את החשבון.`;
+    } else if (remaining > 0) {
+      el.innerHTML = `נשאר פתוח: <span class="font-extrabold text-slate-200">${fmtILS(remaining)}</span>`;
+    } else {
+      el.innerHTML = `חרגתם ב: <span class="font-extrabold text-slate-200">${fmtILS(Math.abs(remaining))}</span>`;
     }
 
-    const list = $("#dinersListItemized");
-    if (!list) return;
-
-    // Tip split proportional to subtotal share
+    // distribute tip proportional to subtotals (if sumSub==0 -> finals stay 0)
     const tipAmount = bill * (state.tipPct / 100);
 
-    list.innerHTML = state.diners.map(d => {
+    for (const d of state.diners) {
       const sub = Math.max(0, Number(d.subtotal) || 0);
       const shareTip = (bill > 0 && sumSub > 0) ? (sub / sumSub) * tipAmount : 0;
       const final = sub + shareTip;
 
-      return `
-        <div class="rounded-2xl bg-slate-950 border border-slate-800 p-3">
-          <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-sm font-bold">
-                ${(d.name||"?").trim().slice(0,1) || "?"}
-              </div>
-              <div class="text-sm font-medium">${escapeHtml(d.name || "ללא שם")}</div>
-            </div>
-            <div class="text-xs text-slate-400">
-              סה״כ (כולל טיפ): <span class="font-bold text-slate-200">${fmtILS(final)}</span>
-            </div>
-          </div>
-
-          <div class="mt-2 grid grid-cols-6 gap-2 items-center">
-            <span class="col-span-2 text-xs text-slate-400">מנות</span>
-            <input data-diner-sub="${escapeHtml(d.id)}" type="number" inputmode="decimal" min="0" step="0.01"
-              value="${sub ? String(sub) : ""}"
-              class="col-span-4 w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-600"
-              placeholder="0" />
-          </div>
-        </div>
-      `;
-    }).join("");
+      const label = document.querySelector(`[data-item-final="${CSS.escape(d.id)}"]`);
+      if (label) label.textContent = fmtILS(final);
+    }
   }
 
-  // ----- Roulette wheel SVG -----
+  // --- ROULETTE (fix: spin wrapper div, always works) ---
+  let wheelBuilt = false;
+
   const polarToCartesian = (r, angleDeg) => {
     const a = (angleDeg - 90) * Math.PI / 180;
     return { x: r * Math.cos(a), y: r * Math.sin(a) };
   };
-
   const describeArc = (r, startAngle, endAngle) => {
     const start = polarToCartesian(r, endAngle);
     const end = polarToCartesian(r, startAngle);
@@ -595,7 +590,7 @@
     return ["M",0,0,"L",start.x,start.y,"A",r,r,0,largeArcFlag,0,end.x,end.y,"Z"].join(" ");
   };
 
-  function renderWheel() {
+  function drawWheel() {
     const svg = $("#wheelSvg");
     if (!svg) return;
 
@@ -603,7 +598,7 @@
     const n = Math.max(1, names.length);
     const slice = 360 / n;
 
-    const parts = names.map((name, i) => {
+    svg.innerHTML = names.map((name, i) => {
       const start = i * slice;
       const end = (i + 1) * slice;
       const hue = Math.round((i * 360) / n);
@@ -617,80 +612,99 @@
         <path d="${describeArc(100, start, end)}" fill="${fill}" opacity="0.95"></path>
         <text x="${labelPos.x}" y="${labelPos.y}" fill="white" font-size="10" font-weight="800"
               text-anchor="middle" dominant-baseline="middle"
-              transform="rotate(${mid} ${labelPos.x} ${labelPos.y})">
-          ${safeName}
-        </text>
+              transform="rotate(${mid} ${labelPos.x} ${labelPos.y})">${safeName}</text>
       `;
-    }).join("");
-
-    svg.innerHTML = `
-      <g id="wheelGroup"
-        style="transform-origin: 0px 0px; transform: rotate(${state.wheelRotation}deg);
-               transition: transform 1200ms cubic-bezier(0.15, 0.9, 0.2, 1);">
-        ${parts}
-        <circle cx="0" cy="0" r="18" fill="rgba(15,23,42,0.92)" stroke="rgba(148,163,184,0.25)"></circle>
-      </g>
+    }).join("") + `
+      <circle cx="0" cy="0" r="18" fill="rgba(15,23,42,0.92)" stroke="rgba(148,163,184,0.25)"></circle>
     `;
+
+    wheelBuilt = true;
+  }
+
+  function applyWheelRotation(animated=true) {
+    const wr = $("#wheelRotate");
+    if (!wr) return;
+    wr.style.transition = animated
+      ? "transform 1700ms cubic-bezier(0.15, 0.9, 0.2, 1)"
+      : "none";
+    wr.style.transform = `rotate(${state.wheelRotation}deg)`;
   }
 
   function renderRoulette() {
-    const list = $("#dinersListRoulette");
-    if (list) list.innerHTML = state.diners.map(d => dinerRow(d, { showRemove: true })).join("");
+    $("#dinersListRoulette").innerHTML = state.diners.map(d => dinerRow(d, { showRemove: true })).join("");
 
-    renderWheel();
+    if (!wheelBuilt) drawWheel();
+    applyWheelRotation(false);
 
-    const winnerBox = $("#winnerBox");
-    const winnerName = $("#winnerName");
     const winner = state.diners.find(d => d.id === state.lastWinnerId);
-
-    if (winner && winnerBox && winnerName) {
-      winnerBox.classList.remove("hidden");
-      winnerName.textContent = winner.name || "ללא שם";
-    } else if (winnerBox) {
-      winnerBox.classList.add("hidden");
+    if (winner) {
+      $("#winnerBox").classList.remove("hidden");
+      $("#winnerName").textContent = winner.name || "ללא שם";
+    } else {
+      $("#winnerBox").classList.add("hidden");
     }
   }
 
   function renderAll() {
+    renderPill();
     const screen = currentScreenFromHash();
+
     if (screen === "dashboard") renderDashboard();
     if (screen === "equal") renderEqual();
-    if (screen === "itemized") renderItemized();
+
+    if (screen === "itemized") {
+      if (!itemizedBuilt) buildItemizedList();
+      else updateItemizedDerived();
+    }
+
     if (screen === "roulette") renderRoulette();
+
     try { lucide.createIcons(); } catch (_) {}
   }
 
   // ---------- Events ----------
-  $$(".navBtn").forEach(btn => btn.addEventListener("click", () => showScreen(btn.dataset.nav)));
-  $$(".goBtn").forEach(btn => btn.addEventListener("click", () => showScreen(btn.dataset.go)));
-
   window.addEventListener("hashchange", () => showScreen(currentScreenFromHash()));
 
-  $("#billMinus")?.addEventListener("click", () => {
+  $$(".tabBtn").forEach(btn => btn.addEventListener("click", () => showScreen(btn.dataset.nav)));
+  $$(".goBtn").forEach(btn => btn.addEventListener("click", () => showScreen(btn.dataset.go)));
+
+  $("#goDashboardPill").addEventListener("click", () => showScreen("dashboard"));
+
+  $("#billMinus").addEventListener("click", () => {
     state.billAmount = Math.max(0, (Number(state.billAmount) || 0) - 10);
-    saveState(); renderAll();
+    saveState();
+    renderAll();
   });
-
-  $("#billPlus")?.addEventListener("click", () => {
+  $("#billPlus").addEventListener("click", () => {
     state.billAmount = (Number(state.billAmount) || 0) + 10;
-    saveState(); renderAll();
+    saveState();
+    renderAll();
   });
-
-  $("#billAmount")?.addEventListener("input", (e) => {
+  $("#billAmount").addEventListener("input", (e) => {
     state.billAmount = Math.max(0, Number(e.target.value) || 0);
     saveState();
-    // don't render on every keypress if focused? we DO render (it's ok) but keep value if focused
+    renderAll();
+  });
+  $("#tipPct").addEventListener("input", (e) => {
+    state.tipPct = clamp(Number(e.target.value) || 0, 0, 25);
+    saveState();
     renderAll();
   });
 
-  $("#tipPct")?.addEventListener("input", (e) => {
-    state.tipPct = clamp(Number(e.target.value) || 0, 0, 25);
-    saveState(); renderAll();
+  $("#addDiner").addEventListener("click", () => {
+    state.diners.push({ id: safeUUID(), name: `חבר ${state.diners.length + 1}`, subtotal: 0 });
+    itemizedBuilt = false;
+    wheelBuilt = false;
+    saveState();
+    renderAll();
   });
 
-  $("#addDiner")?.addEventListener("click", () => {
-    state.diners.push({ id: safeUUID(), name: `חבר ${state.diners.length + 1}`, subtotal: 0 });
-    saveState(); renderAll();
+  $("#resetSubs").addEventListener("click", () => {
+    state.diners.forEach(d => d.subtotal = 0);
+    saveState();
+    itemizedBuilt = false; // rebuild list clean
+    renderAll();
+    toast("אופסו סכומי הפריטים ✅");
   });
 
   document.addEventListener("click", (e) => {
@@ -699,68 +713,80 @@
       const id = rm.dataset.dinerRemove;
       state.diners = state.diners.filter(d => d.id !== id);
       if (state.lastWinnerId === id) state.lastWinnerId = null;
-      saveState(); renderAll();
+
+      itemizedBuilt = false;
+      wheelBuilt = false;
+      saveState();
+      renderAll();
     }
   });
 
-  // Update names: keep cursor stable (no re-render while typing)
+  // Names: update state בלי רינדור מלא (ללא קפיצות)
   document.addEventListener("input", (e) => {
     const nameInput = e.target.closest("[data-diner-name]");
     if (nameInput) {
       const id = nameInput.dataset.dinerName;
       const d = state.diners.find(x => x.id === id);
-      if (d) { d.name = nameInput.value; saveState(); }
+      if (d) d.name = nameInput.value;
+
+      // update initial locally (no re-render)
+      const row = nameInput.closest("div");
+      const initialEl = row?.querySelector?.("[data-initial]");
+      if (initialEl) initialEl.textContent = (nameInput.value.trim().slice(0,1) || "?");
+
+      saveState();
+      renderPill();
       return;
     }
 
+    // Itemized subtotals: update derived only (fixes “לא עובדת”)
     const subInput = e.target.closest("[data-diner-sub]");
     if (subInput) {
       const id = subInput.dataset.dinerSub;
       const d = state.diners.find(x => x.id === id);
-      if (d) {
-        d.subtotal = Math.max(0, Number(subInput.value) || 0);
-        saveState();
-        renderAll(); // totals/progress live
-      }
+      if (d) d.subtotal = Math.max(0, Number(subInput.value) || 0);
+      saveState();
+      updateItemizedDerived();
     }
   });
 
-  // After leaving name input: re-render to update initials + wheel labels
-  document.addEventListener("blur", (e) => {
-    if (e.target?.matches?.("[data-diner-name]")) renderAll();
-  }, true);
-
-  $("#btnReset")?.addEventListener("click", () => {
+  // Reset all
+  $("#btnReset").addEventListener("click", () => {
     state = safeClone(defaultState);
+    itemizedBuilt = false;
+    wheelBuilt = false;
     saveState();
     toast("אופס—אופס! הכל אופס.");
     showScreen("dashboard");
   });
 
+  // Equal copy/share
   const buildEqualMsg = () => {
     const n = state.diners.length || 1;
     const per = totalWithTip() / n;
     return `KamaKama (SplitIt) 🍽️\nסה״כ חשבון: ${fmtILS(state.billAmount)}\nטיפ: ${state.tipPct}%\nלכל אחד/ת: ${fmtILS(per)}\nתודה!`;
   };
 
-  $("#copyEqualMsg")?.addEventListener("click", async () => {
+  $("#copyEqualMsg").addEventListener("click", async () => {
     if (state.diners.length === 0 || state.billAmount <= 0) return toast("תוסיף/י סועדים וסכום בדשבורד 🙂");
     await copyText(buildEqualMsg());
   });
 
-  $("#shareEqualMsg")?.addEventListener("click", async () => {
+  $("#shareEqualMsg").addEventListener("click", async () => {
     if (state.diners.length === 0 || state.billAmount <= 0) return toast("תוסיף/י סועדים וסכום בדשבורד 🙂");
     const text = buildEqualMsg();
     const ok = await safeShare({ title: "KamaKama (SplitIt)", text });
     if (!ok) await copyText(text);
   });
 
+  // Roulette spin
   let spinning = false;
-  const pickWinnerIndex = (n) => Math.floor(Math.random() * n);
 
-  $("#spinBtn")?.addEventListener("click", async () => {
+  $("#spinBtn").addEventListener("click", async () => {
     if (spinning) return;
     if (state.diners.length < 2) return toast("צריך לפחות 2 סועדים לרולטה 🙂");
+
+    if (!wheelBuilt) drawWheel();
 
     spinning = true;
     const btn = $("#spinBtn");
@@ -768,30 +794,29 @@
     btn.classList.add("opacity-70");
 
     const n = state.diners.length;
-    const idx = pickWinnerIndex(n);
+    const idx = Math.floor(Math.random() * n);
 
+    // want chosen slice center at top pointer (0deg)
     const slice = 360 / n;
     const targetCenter = idx * slice + slice / 2;
 
-    const spins = 4 + Math.floor(Math.random() * 3);
+    const spins = 5 + Math.floor(Math.random() * 3); // 5-7
     const current = state.wheelRotation % 360;
     const deltaToTop = (360 - targetCenter) - current;
-    const targetRotation = state.wheelRotation + spins * 360 + deltaToTop;
+    state.wheelRotation = state.wheelRotation + spins * 360 + deltaToTop;
 
-    state.wheelRotation = targetRotation;
     state.lastWinnerId = state.diners[idx].id;
     saveState();
-    renderAll();
 
-    try { navigator.vibrate?.([50, 40, 60]); } catch (_) {}
+    applyWheelRotation(true);
 
-    await new Promise(res => setTimeout(res, 1300));
+    // wait end of transition
+    await new Promise(res => setTimeout(res, 1750));
 
-    try {
-      confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
-    } catch (_) {}
-
+    try { confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } }); } catch (_) {}
     toast("יש זוכה! 🎉");
+
+    renderRoulette(); // show winner box
 
     spinning = false;
     btn.disabled = false;
@@ -804,13 +829,13 @@
     return `KamaKama (SplitIt) 🎯\nרולטת אשראי: הזוכה הוא/היא — ${name} 💳\n(אל תשכחו טיפ 😉)`;
   };
 
-  $("#shareWinner")?.addEventListener("click", async () => {
+  $("#shareWinner").addEventListener("click", async () => {
     const text = buildWinnerMsg();
     const ok = await safeShare({ title: "KamaKama (SplitIt)", text });
     if (!ok) await copyText(text);
   });
 
-  $("#copyWinner")?.addEventListener("click", async () => {
+  $("#copyWinner").addEventListener("click", async () => {
     await copyText(buildWinnerMsg());
   });
 
@@ -820,4 +845,3 @@
 </script>
 </body>
 </html>
-
