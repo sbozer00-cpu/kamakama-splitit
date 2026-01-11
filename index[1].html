@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KamaKama (SplitIt)</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    html, body { font-family: "Rubik", system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    /* Keep number inputs consistent */
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type="number"] { -moz-appearance: textfield; }
+  </style>
+</head>
+
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+  <div class="max-w-xl mx-auto p-4 pb-20">
+    <!-- Header -->
+    <header class="flex items-center justify-between gap-3 mb-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-slate-800 flex items-center justify-center shadow">
+          <i data-lucide="split" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="text-lg font-bold leading-tight">KamaKama <span class="text-slate-300 font-medium">(SplitIt)</span></div>
+          <div class="text-xs text-slate-400">חלוקה חברתית • מהירה • משחקית</div>
+        </div>
+      </div>
+
+      <button id="btnReset" class="inline-flex items-center gap-2 text-xs px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 transition">
+        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+        איפוס
+      </button>
+    </header>
+
+    <!-- Nav -->
+    <nav class="grid grid-cols-4 gap-2 mb-4">
+      <button data-nav="dashboard" class="navBtn px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 transition text-sm">דשבורד</button>
+      <button data-nav="equal" class="navBtn px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 transition text-sm">שווה</button>
+      <button data-nav="itemized" class="navBtn px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 transition text-sm">פריטים</button>
+      <button data-nav="roulette" class="navBtn px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 transition text-sm">רולטה</button>
+    </nav>
+
+    <!-- Toast -->
+    <div id="toast" class="hidden mb-4 rounded-xl border border-slate-800 bg-slate-900/70 px-4 py-3 text-sm text-slate-200"></div>
+
+    <!-- Screens -->
+    <main>
+      <!-- DASHBOARD -->
+      <section data-screen="dashboard" class="screen space-y-4">
+        <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 shadow">
+          <div class="flex items-center justify-between">
+            <h2 class="font-bold text-base">סכום החשבון</h2>
+            <span class="text-xs text-slate-400">ללא התקנה • עובד בדפדפן</span>
+          </div>
+
+          <div class="mt-3 grid grid-cols-6 gap-2 items-center">
+            <button id="billMinus" class="col-span-1 rounded-xl bg-slate-800 hover:bg-slate-700 transition py-3 text-sm">-10</button>
+            <input id="billAmount" type="number" inputmode="decimal" min="0" step="0.01"
+                   class="col-span-4 w-full rounded-xl bg-slate-950 border border-slate-800 px-4 py-3 text-lg font-bold text-center outline-none focus:ring-2 focus:ring-slate-600"
+                   placeholder="0" />
+            <button id="billPlus" class="col-span-1 rounded-xl bg-slate-800 hover:bg-slate-700 transition py-3 text-sm">+10</button>
+          </div>
+
+          <div class="mt-4 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i data-lucide="receipt" class="w-4 h-4 text-slate-300"></i>
+              <span class="text-sm text-slate-300">טיפ</span>
+              <span id="tipPctLabel" class="text-sm font-bold">12%</span>
+            </div>
+            <div class="text-sm text-slate-300">
+              סה״כ לתשלום: <span id="totalWithTipLabel" class="font-bold">0 ₪</span>
+            </div>
+          </div>
+
+          <input id="tipPct" type="range" min="0" max="25" step="1"
+                 class="w-full mt-2 accent-slate-400" />
+          <div class="text-xs text-slate-500 mt-1">טיפ מחושב על כל החשבון, ומתחלק לפי מצב החלוקה.</div>
+        </div>
+
+        <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 shadow">
+          <div class="flex items-center justify-between">
+            <h2 class="font-bold text-base">סועדים</h2>
+            <button id="addDiner" class="inline-flex items-center gap-2 text-xs px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 transition">
+              <i data-lucide="user-plus" class="w-4 h-4"></i>
+              הוסף
+            </button>
+          </div>
+
+          <div id="dinersListDashboard" class="mt-3 space-y-2"></div>
+
+          <div class="mt-3 flex items-center justify-between text-sm">
+            <div class="text-slate-300">כמות סועדים: <span id="dinersCount" class="font-bold">0</span></div>
+            <div class="text-slate-400 text-xs">טיפ: ערוך/י שמות, הוסף/י או הסר/י בקליק.</div>
+          </div>
+        </div>
+
+        <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 shadow">
+          <h2 class="font-bold text-base mb-2">מה עושים עכשיו?</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <button data-go="equal" class="goBtn rounded-2xl bg-slate-800 hover:bg-slate-700 transition p-3 text-right">
+              <div class="flex items-center gap-2 font-bold"><i data-lucide="divide" class="w-4 h-4"></i> חלוקה שווה</div>
+              <div class="text-xs text-slate-300 mt-1">סכום אחיד לכל אחד/ת</div>
+            </button>
+            <button data-go="itemized" class="goBtn rounded-2xl bg-slate-800 hover:bg-slate-700 transition p-3 text-right">
+              <div class="flex items-center gap-2 font-bold"><i data-lucide="list" class="w-4 h-4"></i> לפי פריטים</div>
+              <div class="text-xs text-slate-300 mt-1">כל אחד מזין כמה אכל</div>
+            </button>
+            <button data-go="roulette" class="goBtn rounded-2xl bg-slate-800 hover:bg-slate-700 transition p-3 text-right">
+              <div class="flex items-center gap-2 font-bold"><i data-lucide="sparkles" class="w-4 h-4"></i> רולטת אשראי</div>
+              <div class="text-xs text-slate-300 mt-1">מגרילים מי משלם 😈</div>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- EQUAL -->
+      <section data-screen="equal" class="screen hidden space-y-4">
+        <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 shadow">
+          <div class="flex items-center justify-between">
+            <h2 class="font-bold text-base">חלוקה שווה</h2>
+            <span class="text-xs text-slate-400">כולל טיפ</span>
+          </div>
+
+          <div class="mt-3 rounded-2xl bg-slate-950 border border-slate-800 p-4">
+            <div class="text-sm text-slate-400">לכל אחד/ת:</div>
+            <div id="equalPerPerson" class="text-3xl font-extrabold mt-1">0 ₪</div>
+            <div id="equalMeta" class="text-xs text-slate-500 mt-2"></div>
+          </div>
+
+          <div class="mt-3 flex flex-col sm:flex-row gap-2">
+            <button id="copyEqualMsg" class="flex-1 rounded-2xl bg-slate-800 hover:bg-slate-700 transition p-3 text-sm inline-flex items-center justify-center gap-2">
+              <i data-lucide="copy" class="w-4 h-4"></i>
+              העתק הודעה לתשלום
+            </button>
+            <button id="shareEqualMsg" class="flex-1 rounded-2xl bg-slate-800 hover:bg-slate-700 transition p-3 text-sm inline-flex items-center justify-center gap-2">
+              <i data-lucide="share-2" class="w-4 h-4"></i>
+              שתף
+            </button>
+          </div>
+
+          <div class="mt-3 text-xs text-slate-500">"טיפ לחיסכון בזמן": הודעת העתק-הדבק מוכנה לוואטסאפ/ביט/פייבוקס.</div>
+        </div>
+
+        <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 shadow">
+          <h3 class="font-bold text-sm mb-2">פירוט</h3>
+          <div id="equalBreakdown" class="space-y-2"></div>
+        </div>
+      </section>
+
+      <!-- ITEMIZED -->
+      <section data-screen="itemized" class="screen hidden space-y-4">
+        <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 shadow">
+          <div class="flex items-center justify-between">
+            <h2 class="font-bold text-base">חלוקה לפי פריטים</h2>
+            <span class="text-xs text-slate-400">טיפ מחולק פרופורציונלית</span>
+          </div>
+
+          <div class="mt-3">
+            <div class="text-sm text-slate-300 flex items-center justify-between">
+              <span>כיסוי החשבון (ללא טיפ):</span>
+              <span id="itemProgressLabel" class="font-bold">0%</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-3 mt-2 overflow-hidden border border-slate-700">
+              <div id="itemProgressBar" class="h-full bg-slate-300 w-0"></div>
+            </div>
+            <div id="itemRemaining" class="text-xs text-slate-400 mt-2"></div>
+          </div>
+        </div>
+
+        <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 shadow">
+          <h3 class="font-bold text-sm mb-2">הזינו סכום מנות לכל סועד/ת (ללא טיפ)</h3>
+          <div id="dinersListItemized" class="space-y-2"></div>
+
+          <div class="mt-4 rounded-2xl bg-slate-950 border border-slate-800 p-4">
+            <div class="text-sm text-slate-400">סה״כ לתשלום (כולל טיפ):</div>
+            <div id="itemTotalWithTip" class="text-2xl font-extrabold mt-1">0 ₪</div>
+            <div class="text-xs text-slate-500 mt-2">כל שורה מציגה גם את הסכום הסופי של אותו סועד/ת אחרי טיפ_toggle.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ROULETTE -->
+      <section data-screen="roulette" class="screen hidden space-y-4">
+        <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 shadow">
+          <div class="flex items-center justify-between">
+            <h2 class="font-bold text-base">רולטת אשראי</h2>
+            <span class="text-xs text-slate-400">Gamification</span>
+          </div>
+
+          <div class="mt-3 flex flex-col items-center gap-3">
+            <div class="relative">
+              <div class="w-72 h-72 sm:w-80 sm:h-80 rounded-full bg-slate-950 border border-slate-800 shadow overflow-hidden flex items-center justify-center">
+                <svg id="wheelSvg" viewBox="-110 -110 220 220" class="w-full h-full"></svg>
+              </div>
+
+              <!-- pointer -->
+              <div class="absolute -top-2 left-1/2 -translate-x-1/2">
+                <div class="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[18px] border-b-slate-200 drop-shadow"></div>
+              </div>
+            </div>
+
+            <button id="spinBtn" class="w-full rounded-2xl bg-slate-200 text-slate-950 hover:bg-white transition py-3 font-bold inline-flex items-center justify-center gap-2">
+              <i data-lucide="play" class="w-5 h-5"></i>
+              סובב!
+            </button>
+
+            <div id="winnerBox" class="hidden w-full rounded-2xl bg-slate-950 border border-slate-800 p-4">
+              <div class="text-sm text-slate-400">המנצח/ת:</div>
+              <div id="winnerName" class="text-2xl font-extrabold mt-1"></div>
+              <div class="mt-3 flex gap-2">
+                <button id="shareWinner" class="flex-1 rounded-2xl bg-slate-800 hover:bg-slate-700 transition p-3 text-sm inline-flex items-center justify-center gap-2">
+                  <i data-lucide="share-2" class="w-4 h-4"></i>
+                  שתף תוצאה
+                </button>
+                <button id="copyWinner" class="flex-1 rounded-2xl bg-slate-800 hover:bg-slate-700 transition p-3 text-sm inline-flex items-center justify-center gap-2">
+                  <i data-lucide="copy" class="w-4 h-4"></i>
+                  העתק
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 shadow">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-sm">עריכה מהירה של שמות</h3>
+            <span class="text-xs text-slate-500">אפשר לערוך כאן בלי לחזור לדשבורד</span>
+          </div>
+          <div id="dinersListRoulette" class="mt-3 space-y-2"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="mt-6 text-center text-xs text-slate-500">
+      <div>Made for quick, fun bill-splitting. Client-side only.</div>
+    </footer>
+  </div>
+
+<script>
+(() => {
+  // ---------- Utilities ----------
+  const $ = (sel, root=document) => root.querySelector(sel);
+  const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
+
+  const fmtILS = (n) => {
+    const x = Number.isFinite(n) ? n : 0;
+    // Keep 2 decimals (currency friendly)
+    return new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' }).format(x);
+  };
+
+  const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+
+  const toast = (msg) => {
+    const el = $("#toast");
+    el.textContent = msg;
+    el.classList.remove("hidden");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => el.classList.add("hidden"), 2200);
+  };
+
+  const safeShare = async ({title, text}) => {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, text });
+        return true;
+      }
+    } catch (e) {}
+    return false;
+  };
+
+  const copyText = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast("הועתק ✅");
+      return true;
+    } catch (e) {
+      // Fallback
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.top = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); toast("הועתק ✅"); } catch (_) { toast("לא הצלחתי להעתיק"); }
+      document.body.removeChild(ta);
+      return false;
+    }
+  };
+
+  // ---------- State ----------
+  const STORAGE_KEY = "kamakama_state_v1";
+  const defaultState = {
+    billAmount: 0,
+    tipPct: 12,
+    diners: [
+      { id: crypto.randomUUID(), name: "שחר", subtotal: 0 },
+      { id: crypto.randomUUID(), name: "נועה", subtotal: 0 },
+      { id: crypto.randomUUID(), name: "דניאל", subtotal: 0 },
+    ],
+    lastWinnerId: null,
+    wheelRotation: 0,
+  };
+
+  const loadState = () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return structuredClone(defaultState);
+      const parsed = JSON.parse(raw);
+      // minimal validation
+      if (!parsed || typeof parsed !== "object") return structuredClone(defaultState);
+      parsed.diners = Array.isArray(parsed.diners) ? parsed.diners : [];
+      if (parsed.diners.length === 0) parsed.diners = structuredClone(defaultState.diners);
+      parsed.tipPct = Number.isFinite(+parsed.tipPct) ? clamp(+parsed.tipPct, 0, 25) : defaultState.tipPct;
+      parsed.billAmount = Number.isFinite(+parsed.billAmount) ? Math.max(0, +parsed.billAmount) : 0;
+      return parsed;
+    } catch {
+      return structuredClone(defaultState);
+    }
+  };
+
+  let state = loadState();
+
+  const saveState = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+
+  // Derived
+  const totalWithTip = () => state.billAmount * (1 + state.tipPct / 100);
+
+  // ---------- Router ----------
+  const setActiveNav = (name) => {
+    $$(".navBtn").forEach(btn => {
+      const active = btn.dataset.nav === name;
+      btn.classList.toggle("bg-slate-200", active);
+      btn.classList.toggle("text-slate-950", active);
+      btn.classList.toggle("bg-slate-800", !active);
+      btn.classList.toggle("text-slate-100", !active);
+    });
+  };
+
+  const showScreen = (name) => {
+    $$(".screen").forEach(sec => sec.classList.toggle("hidden", sec.dataset.screen !== name));
+    setActiveNav(name);
+    location.hash = `#${name}`;
+    renderAll();
+  };
+
+  const currentScreenFromHash = () => {
+    const h = (location.hash || "#dashboard").replace("#","");
+    const allowed = new Set(["dashboard","equal","itemized","roulette"]);
+    return allowed.has(h) ? h : "dashboard";
+  };
+
+  // ---------- Render Helpers ----------
+  const dinerRow = ({id, name}, opts={}) => {
+    const { showRemove=true, extraRightHtml="" } = opts;
+    return `
+      <div class="flex items-center gap-2 rounded-2xl bg-slate-950 border border-slate-800 p-2">
+        <div class="w-9 h-9 rounded-xl bg-slate-800 flex items-center justify-center text-sm font-bold">${(name || "?").trim().slice(0,1) || "?"}</div>
+        <input data-diner-name="${id}" value="${escapeHtml(name || "")}" maxlength="16"
+               class="flex-1 rounded-xl bg-transparent px-2 py-2 outline-none border border-transparent focus:border-slate-700 text-sm"
+               placeholder="שם" />
+        ${extraRightHtml}
+        ${showRemove ? `
+          <button data-diner-remove="${id}" class="shrink-0 rounded-xl bg-slate-800 hover:bg-slate-700 transition px-3 py-2 text-xs">
+            <span class="inline-flex items-center gap-1"><i data-lucide="trash-2" class="w-4 h-4"></i> הסר</span>
+          </button>` : ""}
+      </div>
+    `;
+  };
+
+  const escapeHtml = (s) => String(s)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+
+  // ---------- Rendering ----------
+  function renderDashboard() {
+    $("#billAmount").value = state.billAmount ? String(state.billAmount) : "";
+    $("#tipPct").value = String(state.tipPct);
+    $("#tipPctLabel").textContent = `${state.tipPct}%`;
+    $("#totalWithTipLabel").textContent = fmtILS(totalWithTip());
+    $("#dinersCount").textContent = String(state.diners.length);
+
+    $("#dinersListDashboard").innerHTML = state.diners.map(d => dinerRow(d)).join("");
+  }
+
+  function renderEqual() {
+    const n = state.diners.length;
+    const total = totalWithTip();
+    const per = n > 0 ? total / n : 0;
+    $("#equalPerPerson").textContent = fmtILS(per);
+    $("#equalMeta").textContent = (state.billAmount > 0 && n > 0)
+      ? `חשבון: ${fmtILS(state.billAmount)} • טיפ: ${state.tipPct}% • סה״כ: ${fmtILS(total)} • סועדים: ${n}`
+      : "הזן/י חשבון וסועדים בדשבורד";
+
+    $("#equalBreakdown").innerHTML = state.diners.map(d => `
+      <div class="rounded-2xl bg-slate-950 border border-slate-800 p-3 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-slate-800 flex items-center justify-center text-sm font-bold">${(d.name||"?").trim().slice(0,1) || "?"}</div>
+          <div class="text-sm font-medium">${escapeHtml(d.name || "ללא שם")}</div>
+        </div>
+        <div class="text-sm font-bold">${fmtILS(per)}</div>
+      </div>
+    `).join("");
+  }
+
+  function renderItemized() {
+    const bill = state.billAmount;
+    const total = totalWithTip();
+    $("#itemTotalWithTip").textContent = fmtILS(total);
+
+    const sumSub = state.diners.reduce((acc, d) => acc + (Number.isFinite(+d.subtotal) ? +d.subtotal : 0), 0);
+    const pct = bill > 0 ? clamp((sumSub / bill) * 100, 0, 200) : 0;
+
+    $("#itemProgressLabel").textContent = `${Math.round(pct)}%`;
+    $("#itemProgressBar").style.width = `${clamp(pct, 0, 100)}%`;
+
+    const remaining = bill - sumSub;
+    const ok = bill > 0 && Math.abs(remaining) <= 0.01;
+
+    if (bill <= 0) {
+      $("#itemRemaining").textContent = "הזן/י סכום חשבון בדשבורד כדי לראות התקדמות.";
+    } else if (ok) {
+      $("#itemRemaining").innerHTML = `<span class="font-bold text-slate-200">בול! ✅</span> כיסיתם בדיוק את החשבון.`;
+    } else if (remaining > 0) {
+      $("#itemRemaining").innerHTML = `נשאר פתוח: <span class="font-bold text-slate-200">${fmtILS(remaining)}</span>`;
+    } else {
+      $("#itemRemaining").innerHTML = `חרגתם ב: <span class="font-bold text-slate-200">${fmtILS(Math.abs(remaining))}</span>`;
+    }
+
+    $("#dinersListItemized").innerHTML = state.diners.map(d => {
+      const sub = Number.isFinite(+d.subtotal) ? +d.subtotal : 0;
+      const share = sub * (1 + state.tipPct / 100);
+      return `
+        <div class="rounded-2xl bg-slate-950 border border-slate-800 p-3">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-xl bg-slate-800 flex items-center justify-center text-sm font-bold">${(d.name||"?").trim().slice(0,1) || "?"}</div>
+              <div class="text-sm font-medium">${escapeHtml(d.name || "ללא שם")}</div>
+            </div>
+            <div class="text-xs text-slate-400">אחרי טיפ: <span class="font-bold text-slate-200">${fmtILS(share)}</span></div>
+          </div>
+
+          <div class="mt-2 grid grid-cols-6 gap-2 items-center">
+            <span class="col-span-2 text-xs text-slate-400">מנות</span>
+            <input data-diner-sub="${d.id}" type="number" inputmode="decimal" min="0" step="0.01"
+                   value="${sub ? String(sub) : ""}"
+                   class="col-span-4 w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-600"
+                   placeholder="0" />
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // ----- Roulette wheel SVG -----
+  const polarToCartesian = (r, angleDeg) => {
+    const a = (angleDeg - 90) * Math.PI / 180;
+    return { x: r * Math.cos(a), y: r * Math.sin(a) };
+  };
+
+  const describeArc = (r, startAngle, endAngle) => {
+    const start = polarToCartesian(r, endAngle);
+    const end = polarToCartesian(r, startAngle);
+    const largeArcFlag = (endAngle - startAngle) <= 180 ? "0" : "1";
+    return [
+      "M", 0, 0,
+      "L", start.x, start.y,
+      "A", r, r, 0, largeArcFlag, 0, end.x, end.y,
+      "Z"
+    ].join(" ");
+  };
+
+  function renderWheel() {
+    const svg = $("#wheelSvg");
+    const names = state.diners.map(d => (d.name || "???").trim() || "???");
+    const n = Math.max(1, names.length);
+    const slice = 360 / n;
+
+    const paths = names.map((name, i) => {
+      const start = i * slice;
+      const end = (i + 1) * slice;
+      const hue = Math.round((i * 360) / n);
+      const fill = `hsl(${hue} 65% 45%)`;
+
+      // label position
+      const mid = (start + end) / 2;
+      const labelPos = polarToCartesian(62, mid);
+
+      const rotate = mid; // rotate text along slice
+      const safeName = escapeHtml(name).slice(0, 12);
+
+      return `
+        <path d="${describeArc(100, start, end)}" fill="${fill}" opacity="0.95"></path>
+        <text x="${labelPos.x}" y="${labelPos.y}" fill="white" font-size="10" font-weight="700"
+              text-anchor="middle" dominant-baseline="middle"
+              transform="rotate(${rotate} ${labelPos.x} ${labelPos.y})">
+          ${safeName}
+        </text>
+      `;
+    }).join("");
+
+    svg.innerHTML = `
+      <g id="wheelGroup" style="transform-origin: 0px 0px; transform: rotate(${state.wheelRotation}deg); transition: transform 1200ms cubic-bezier(0.2, 0.9, 0.2, 1);">
+        ${paths}
+        <circle cx="0" cy="0" r="16" fill="rgba(15,23,42,0.9)" stroke="rgba(148,163,184,0.25)"></circle>
+      </g>
+    `;
+  }
+
+  function renderRoulette() {
+    $("#dinersListRoulette").innerHTML = state.diners.map(d => dinerRow(d, { showRemove: true })).join("");
+    renderWheel();
+
+    // winner box
+    const winner = state.diners.find(d => d.id === state.lastWinnerId);
+    if (winner) {
+      $("#winnerBox").classList.remove("hidden");
+      $("#winnerName").textContent = winner.name || "ללא שם";
+    } else {
+      $("#winnerBox").classList.add("hidden");
+    }
+  }
+
+  function renderAll() {
+    // Always render icons after DOM updates
+    const screen = currentScreenFromHash();
+    if (screen === "dashboard") renderDashboard();
+    if (screen === "equal") renderEqual();
+    if (screen === "itemized") renderItemized();
+    if (screen === "roulette") renderRoulette();
+
+    lucide.createIcons();
+  }
+
+  // ---------- Events ----------
+  // Nav buttons
+  $$(".navBtn").forEach(btn => btn.addEventListener("click", () => showScreen(btn.dataset.nav)));
+
+  // Go buttons (dashboard cards)
+  $$(".goBtn").forEach(btn => btn.addEventListener("click", () => showScreen(btn.dataset.go)));
+
+  // hash routing
+  window.addEventListener("hashchange", () => {
+    const s = currentScreenFromHash();
+    setActiveNav(s);
+    renderAll();
+  });
+
+  // Bill controls
+  $("#billMinus").addEventListener("click", () => {
+    state.billAmount = Math.max(0, (Number(state.billAmount) || 0) - 10);
+    saveState();
+    renderAll();
+  });
+
+  $("#billPlus").addEventListener("click", () => {
+    state.billAmount = (Number(state.billAmount) || 0) + 10;
+    saveState();
+    renderAll();
+  });
+
+  $("#billAmount").addEventListener("input", (e) => {
+    state.billAmount = Math.max(0, Number(e.target.value) || 0);
+    saveState();
+    renderAll();
+  });
+
+  $("#tipPct").addEventListener("input", (e) => {
+    state.tipPct = clamp(Number(e.target.value) || 0, 0, 25);
+    saveState();
+    renderAll();
+  });
+
+  // Diners: add / remove / edit names (event delegation)
+  $("#addDiner").addEventListener("click", () => {
+    state.diners.push({ id: crypto.randomUUID(), name: `חבר ${state.diners.length + 1}`, subtotal: 0 });
+    saveState();
+    renderAll();
+  });
+
+  document.addEventListener("click", (e) => {
+    const rm = e.target.closest("[data-diner-remove]");
+    if (rm) {
+      const id = rm.dataset.dinerRemove;
+      state.diners = state.diners.filter(d => d.id !== id);
+      if (state.lastWinnerId === id) state.lastWinnerId = null;
+      saveState();
+      renderAll();
+    }
+  });
+
+  document.addEventListener("input", (e) => {
+    const nameInput = e.target.closest("[data-diner-name]");
+    if (nameInput) {
+      const id = nameInput.dataset.dinerName;
+      const d = state.diners.find(x => x.id === id);
+      if (d) {
+        d.name = nameInput.value;
+        saveState();
+        // Don't re-render on each keystroke to avoid cursor jumps; wheel will update on blur/hash change
+      }
+    }
+
+    const subInput = e.target.closest("[data-diner-sub]");
+    if (subInput) {
+      const id = subInput.dataset.dinerSub;
+      const d = state.diners.find(x => x.id === id);
+      if (d) {
+        d.subtotal = Math.max(0, Number(subInput.value) || 0);
+        saveState();
+        renderAll(); // update progress & totals live
+      }
+    }
+  });
+
+  document.addEventListener("blur", (e) => {
+    const nameInput = e.target.closest("[data-diner-name]");
+    if (nameInput) {
+      renderAll(); // update initials + wheel labels after editing
+    }
+  }, true);
+
+  // Reset
+  $("#btnReset").addEventListener("click", () => {
+    state = structuredClone(defaultState);
+    saveState();
+    toast("אופס—אופס! הכל אופס.");
+    showScreen("dashboard");
+  });
+
+  // Equal: copy/share message
+  const buildEqualMsg = () => {
+    const n = state.diners.length || 1;
+    const per = totalWithTip() / n;
+    return `KamaKama (SplitIt) 🍽️\nסה״כ חשבון: ${fmtILS(state.billAmount)}\nטיפ: ${state.tipPct}%\nלכל אחד/ת: ${fmtILS(per)}\nתודה!`;
+  };
+
+  $("#copyEqualMsg").addEventListener("click", async () => {
+    if (state.diners.length === 0 || state.billAmount <= 0) return toast("תוסיף/י סועדים וסכום בדשבורד 🙂");
+    await copyText(buildEqualMsg());
+  });
+
+  $("#shareEqualMsg").addEventListener("click", async () => {
+    if (state.diners.length === 0 || state.billAmount <= 0) return toast("תוסיף/י סועדים וסכום בדשבורד 🙂");
+    const text = buildEqualMsg();
+    const ok = await safeShare({ title: "KamaKama (SplitIt)", text });
+    if (!ok) await copyText(text);
+  });
+
+  // Roulette: spin logic
+  let spinning = false;
+  const pickWinnerIndex = (n) => Math.floor(Math.random() * n);
+
+  $("#spinBtn").addEventListener("click", async () => {
+    if (spinning) return;
+    if (state.diners.length < 2) return toast("צריך לפחות 2 סועדים לרולטה 🙂");
+
+    spinning = true;
+    $("#spinBtn").disabled = true;
+    $("#spinBtn").classList.add("opacity-70");
+
+    const n = state.diners.length;
+    const idx = pickWinnerIndex(n);
+
+    // Wheel math: each slice is 360/n. Pointer is at 0 degrees (top).
+    // We want chosen slice centered at top after rotation.
+    const slice = 360 / n;
+    const targetCenter = idx * slice + slice / 2;
+
+    // Add multiple full spins for fun
+    const spins = 4 + Math.floor(Math.random() * 3); // 4-6
+    const current = state.wheelRotation % 360;
+    const deltaToTop = (360 - targetCenter) - current;
+    const targetRotation = state.wheelRotation + spins * 360 + deltaToTop;
+
+    state.wheelRotation = targetRotation;
+    state.lastWinnerId = state.diners[idx].id;
+    saveState();
+
+    renderAll();
+
+    // Haptic feedback (mobile)
+    try { navigator.vibrate?.([50, 40, 60]); } catch {}
+
+    // Wait for CSS transition
+    await new Promise(res => setTimeout(res, 1300));
+
+    // Confetti
+    try {
+      confetti({
+        particleCount: 90,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    } catch {}
+
+    // Show winner box (already rendered)
+    toast("יש זוכה! 🎉");
+
+    spinning = false;
+    $("#spinBtn").disabled = false;
+    $("#spinBtn").classList.remove("opacity-70");
+  });
+
+  const buildWinnerMsg = () => {
+    const winner = state.diners.find(d => d.id === state.lastWinnerId);
+    const name = winner?.name || "מישהו";
+    return `KamaKama (SplitIt) 🎯\nרולטת אשראי: הזוכה הוא/היא — ${name} 💳\n(אל תשכחו טיפ 😉)`;
+  };
+
+  $("#shareWinner").addEventListener("click", async () => {
+    const text = buildWinnerMsg();
+    const ok = await safeShare({ title: "KamaKama (SplitIt)", text });
+    if (!ok) await copyText(text);
+  });
+
+  $("#copyWinner").addEventListener("click", async () => {
+    await copyText(buildWinnerMsg());
+  });
+
+  // Initial mount
+  showScreen(currentScreenFromHash());
+})();
+</script>
+</body>
+</html>
